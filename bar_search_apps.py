@@ -8,37 +8,8 @@ from PyQt5.QtWidgets import (QApplication, QWidget, QAbstractScrollArea,
                              QTableWidget, QTableWidgetItem)
 from PyQt5.QtGui import QColor, QFont
 from PyQt5.QtCore import Qt, QSize, pyqtSlot
-icons = True
-try:
-    import gi
-    gi.require_version('Gtk', '3.0')
-    from gi.repository import Gtk
-except ImportError:
-    icons = False
 
 #functions----------
-def icon_attr(entry):
-    if icons is False:
-        return ''
-
-    name = entry.getIcon()
-    if os.path.exists(name):
-        return ' icon="' + name + '"'
-
-    # work around broken .desktop files
-    # unless the icon is a full path it should not have an extension
-    name = re.sub('\..{3,4}$', '', name)
-
-    # imlib2 cannot load svg
-    iconinfo = theme.lookup_icon(name, 22, Gtk.IconLookupFlags.NO_SVG)
-    if iconinfo:
-        iconfile = iconinfo.get_filename()
-        if hasattr(iconinfo, 'free'):
-            iconinfo.free()
-        if iconfile:
-            return ' icon="' + iconfile + '"'
-    return ''
-
 def escape_utf8(s):
     if sys.version_info[0] < 3 and isinstance(s, unicode):
             s = s.encode('utf-8', 'xmlcharrefreplace')
@@ -68,7 +39,7 @@ def entry_exec(entry):
         
 # GUI------------------
 class Bar(QWidget):
-    def __init__(self,file_in,icons_in):
+    def __init__(self,file_in):
         super().__init__()
         self.initUI()
         self.fileout = file_in
@@ -81,9 +52,7 @@ class Bar(QWidget):
             
         # lie to get the same menu as in GNOME
         xdg.Config.setWindowManager('GNOME')
-
-        if icons_in:
-            theme = Gtk.IconTheme.get_default()
+        
         menu = xdg.Menu.parse('applications.menu')
         list(map(self.populate_menu, menu.getEntries()))
 
@@ -216,6 +185,6 @@ if __name__ == '__main__':
         os.makedirs(os.path.dirname(outfile),exist_ok=True)
     
     app = QApplication(sys.argv)
-    bbr = Bar(outfile,icons)
+    bbr = Bar(outfile)
     sys.exit(app.exec_())
 
