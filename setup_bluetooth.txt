@@ -1,0 +1,29 @@
+# To setup bluetooth
+Before anything list the current wireless devices
+
+$ rkfill list
+
+Then, unblock bluetooth
+
+$ rfkill unblock bluetooth
+
+type bluetoothctl and power bluetooth off
+
+[bluetoothctl]# power off
+
+Now we can follow the steps to scan, pair and connect a device
+
+[bluetooth]# power on
+[bluetooth]# agent on
+[bluetooth]# default-agent
+[bluetooth]# scan on
+
+Find the device and get the MAC address, then pair and connect
+[bluetooth]# pair 00:00:00:etc
+[bluetooth]# connect 00:00:00:etc
+
+Then scan off and exit
+[bluetooth]# scan off
+[bluetooth]# quit
+
+
