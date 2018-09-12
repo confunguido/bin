@@ -26,4 +26,5 @@ Then scan off and exit
 [bluetooth]# scan off
 [bluetooth]# quit
 
-
+To check on the audio use
+$ pavucontrol
