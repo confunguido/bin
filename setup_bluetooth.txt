@@ -1,7 +1,7 @@
 # To setup bluetooth
 Before anything list the current wireless devices
 
-$ rkfill list
+$ rfkill list
 
 Then, unblock bluetooth
 
@@ -28,3 +28,5 @@ Then scan off and exit
 
 To check on the audio use
 $ pavucontrol
+
+use the script pair_bluetooth.sh :)
