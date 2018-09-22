@@ -3,9 +3,9 @@ import re, sys, os,errno
 import xdg.Menu, xdg.DesktopEntry, xdg.Config
 from xml.sax.saxutils import escape
 
-from PyQt5.QtWidgets import (QApplication, QWidget, QAbstractScrollArea,
-                             QLineEdit, QLabel,QSizeGrip,QVBoxLayout,
-                             QTableWidget, QTableWidgetItem)
+from PyQt5.QtWidgets import (QApplication, QWidget, QAbstractScrollArea, QMainWindow,
+                             QLineEdit, QLabel,QSizeGrip,QVBoxLayout,QGridLayout,
+                             QTableWidget, QTableWidgetItem,QDesktopWidget)
 from PyQt5.QtGui import QColor, QFont
 from PyQt5.QtCore import Qt, QSize, pyqtSlot
 
@@ -45,16 +45,19 @@ class Bar(QWidget):
         self.fileout = file_in
         self.applications_items = list()
         self.matches_list = list()
-        self.setGeometry(750,20,400,20)
+        self.w = 400
+        qtRectangle = self.frameGeometry()
+        self.centerPoint = QDesktopWidget().availableGeometry().center()
+        self.setGeometry(self.centerPoint.x() - self.w / 2,20,self.w,20)
         lang = os.environ.get('LANG')
         if lang:
             xdg.Config.setLocale(lang)
             
         # lie to get the same menu as in GNOME
-        xdg.Config.setWindowManager('GNOME')
+        #xdg.Config.setWindowManager('GNOME')
         
         menu = xdg.Menu.parse('applications.menu')
-        list(map(self.populate_menu, menu.getEntries()))
+        list(map(self.populate_menu, list(menu.getEntries())))
 
     def initUI(self):
         qle = QLineEdit(self)        
@@ -99,12 +102,12 @@ class Bar(QWidget):
             self.tableSearch.rowCount() > 0):
             if self.tableSearch.selectedItems()[0].row() < self.tableSearch.rowCount() - 1:
                 self.tableSearch.selectRow(self.tableSearch.selectedItems()[0].row() + 1)
-                print("down")
+                #print("down")
         if (event.key()==Qt.Key_Up and
             self.tableSearch.rowCount() > 0):
             if self.tableSearch.selectedItems()[0].row() > 0:
                 self.tableSearch.selectRow(self.tableSearch.selectedItems()[0].row() - 1)
-                print("up")
+                #print("up")
         
     @pyqtSlot()
     def on_click(self):
@@ -128,7 +131,7 @@ class Bar(QWidget):
         wsize = 40 + nmatches*49
         self.tableSearch.setRowCount(nmatches)
         self.tableSearch.setColumnCount(1)
-        self.setGeometry(750,20,400,wsize)
+        self.setGeometry(self.centerPoint.x() - self.w / 2,20,self.w,wsize)
         nn = 0
         for m in self.matches_list:
             str_tmp = '%s' % (entry_name(m.DesktopEntry))
@@ -151,7 +154,7 @@ class Bar(QWidget):
         
     def populate_menu(self,entry):
         if isinstance(entry, xdg.Menu.Menu) and entry.Show is True:
-            list(map(self.populate_menu, entry.getEntries()))
+            list(map(self.populate_menu, list(entry.getEntries())))
         elif isinstance(entry, xdg.Menu.MenuEntry) and entry.Show is True:
             self.applications_items.append(entry)
                 
