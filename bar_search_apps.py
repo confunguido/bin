@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 import re, sys, os,errno
+from math import exp
 import xdg.Menu, xdg.DesktopEntry, xdg.Config
 from xml.sax.saxutils import escape
 
@@ -48,7 +49,7 @@ class Bar(QWidget):
         self.w = 400
         qtRectangle = self.frameGeometry()
         self.centerPoint = QDesktopWidget().availableGeometry().center()
-        self.setGeometry(self.centerPoint.x() - self.w / 2,20,self.w,20)
+        self.setGeometry(self.centerPoint.x() - self.w / 2,25,self.w,20)
         lang = os.environ.get('LANG')
         if lang:
             xdg.Config.setLocale(lang)
@@ -122,26 +123,46 @@ class Bar(QWidget):
 
         
     def onChanged(self,text):
+        self.mataches_list = list()
         if text != '':
-            self.matches_list = self.find_matches(text, self.applications_items)
-        else:
-            self.matches_list = list()
+            try:
+                self.matches_list = self.find_matches(text, self.applications_items)
+            except:
+                pass
+
         nmatches = len(self.matches_list)
-        if nmatches >= 9 : nmatches = 9
-        wsize = 40 + nmatches*49
-        self.tableSearch.setRowCount(nmatches)
-        self.tableSearch.setColumnCount(1)
-        self.setGeometry(self.centerPoint.x() - self.w / 2,20,self.w,wsize)
-        nn = 0
-        for m in self.matches_list:
-            str_tmp = '%s' % (entry_name(m.DesktopEntry))
-            trow = QTableWidgetItem(str_tmp)
-            trow.setSizeHint(QSize(400,40))
-            trow.setBackground(QColor(255,255,255,255))
-            self.tableSearch.setItem(nn,0,trow)  
-            nn +=1
-            if nn == 9 : break
-        self.tableSearch.selectRow(0)
+        wsize = 40 + 49
+        if nmatches == 0 or text.startswith('='):
+            result_str = ""
+            if(text.startswith('=')): text = text[1:]
+            try:
+                result_str = eval(text)
+            except:
+                pass
+            if(result_str != ""):
+                self.tableSearch.setRowCount(1)
+                self.tableSearch.setColumnCount(1)
+                self.setGeometry(self.centerPoint.x() - self.w / 2,25,self.w,wsize)
+                trow = QTableWidgetItem("=%s"%(str(result_str)))
+                trow.setSizeHint(QSize(400,40))
+                trow.setBackground(QColor(255,255,255,255))
+                self.tableSearch.setItem(0,0,trow)  
+        else:
+            wsize = 40 + nmatches*49
+            if nmatches >= 9 : nmatches = 9
+            self.tableSearch.setRowCount(nmatches)
+            self.tableSearch.setColumnCount(1)
+            self.setGeometry(self.centerPoint.x() - self.w / 2,25,self.w,wsize)
+            nn = 0
+            for m in self.matches_list:
+                str_tmp = '%s' % (entry_name(m.DesktopEntry))
+                trow = QTableWidgetItem(str_tmp)
+                trow.setSizeHint(QSize(400,40))
+                trow.setBackground(QColor(255,255,255,255))
+                self.tableSearch.setItem(nn,0,trow)  
+                nn +=1
+                if nn == 9 : break
+            self.tableSearch.selectRow(0)
         
     def onReturn(self):
         if len(self.matches_list) > 0:
