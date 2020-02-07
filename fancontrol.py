@@ -25,18 +25,18 @@ if __name__ == '__main__':
 
     while True:
         temp = get_temp()
-        # print("Temp is %.2f" % temp)
+        print("Temp is %.2f" % temp)
         # Start the fan if the temperature has reached the limit and the fan
         # isn't already running.
         # NOTE: `fan.value` returns 1 for "on" and 0 for "off"
         if temp > ON_THRESHOLD and not fan.value:
-            fan.on()
-            # print("Turning fan on")
+            # fan.on()
+            print("Turning fan on")
 
         # Stop the fan if the fan is running and the temperature has dropped
         # to 10 degrees below the limit.
         elif fan.value and temp < OFF_THRESHOLD:
-            fan.off()
-            # print("Turning fan Off")
+            # fan.off()
+            print("Turning fan Off")
 
         time.sleep(SLEEP_INTERVAL)
